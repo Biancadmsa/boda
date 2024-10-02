@@ -1,0 +1,186 @@
+/* Asegúrate de que html y body ocupen toda la altura */
+/* html, body {
+    height: 100%; 
+    
+} */
+
+body {
+    display: flex; /* Usamos flexbox en el body */
+    flex-direction: column; /* Organiza los elementos de forma vertical */
+    min-height: 100vh; /* Asegura que el body ocupe toda la altura de la pantalla */
+    color: rgb(255, 255, 255); /* Color de texto por defecto */
+    font-family: 'Dancing Script'; 
+    font-size: 40px;
+    background-image: url("/image/10133006.jpg");/* Fuente para el cuerpo */
+    opacity: 0.8;
+}
+
+
+.gallery-wrapper {
+    border: 30px solid transparent; /* Tamaño del borde */
+    border-image: url('/image/top-view-natural-cosmetics-with-copy-space.jpg') 230 round; /* Imagen del borde de flores */
+    background-color: rgba(229, 160, 70, 0.6); /* Fondo semitransparente opcional */
+    border-radius: 30px; /* Borde redondeadoado */
+  }
+
+.hero-section {
+    background-size: cover;
+    background-image: url("/image/boda2.jpg");
+    background-repeat: no-repeat;
+    height: 100vh;
+    background-position: center;
+    position: relative;
+    opacity: 0.9;
+  }
+
+
+header, .upload-section, .gallery-section, footer {
+    position: relative; /* Asegura que estos elementos estén en un nivel superior */
+    color: rgb(109, 51, 15); /* Color de texto */
+    font-size: 20px; /* Tamaño de fuente */
+}
+
+h1{
+    
+    color: rgb(255, 255, 255); 
+    font-family: 'Dancing Script'; /* Fuente para el título */
+    font-size: 60px; /* Tamaño de fuente del título */
+    font-weight: 600;
+    text-align: left;
+    margin-top: 5px;
+    text-shadow: 4px 4px 18px rgba(0, 0, 0, 0.7); 
+
+}
+
+h2 {
+    color: rgb(109, 51, 15); 
+    font-family: 'Dancing Script'; /* Fuente para el título */
+    margin-top: 20px; /* Margen superior */
+    font-size: 60px; /* Tamaño de fuente del título */
+    text-align: center; /* Centra el título */
+    text-shadow: 4px 4px 18px rgba(0, 0, 0, 0.9); 
+}
+
+form {
+    border: 2px solid white; /* Color y grosor del borde */
+    border-radius: 8px; /* Opcional: redondear las esquinas del borde */
+    padding: 20px; /* Espaciado interno del formulario */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7); /* Sombra negra alrededor del formulario */
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente para mayor contraste (opcional) */
+}
+
+label{
+    font-size: 30px;
+    color:#ffffff;
+}
+.white-icon {
+    color: white; /* Color blanco para las palomas */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7); /* Sombra negra alrededor */
+    font-size: 24px; /* Puedes ajustar el tamaño según prefieras */
+  }
+
+
+.upload-section,
+.gallery-section {
+    flex: 1; /* Permite que estas se expandan para llenar el espacio disponible */
+}
+
+@media (max-width: 575px) {
+    .upload-section button {
+        margin-top: 10px; /* Margen para botones en dispositivos pequeños */
+    }
+}
+
+@media (max-width: 520px) {
+    .hero-section {
+        height: 60vh !important; /* Cambia aquí el valor según tus necesidades */
+    }
+    #text,
+    #text1 {
+        font-size: 40px !important; /* Cambia a .text y .text1 si son clases */
+    }
+}
+
+
+#text {
+    color: white;
+    font-size: 80px;
+    font-weight: 700;
+    text-shadow: 4px 44px 48px rgba(0, 0, 0, 0.7); /* Sombra al borde del texto */
+    text-align: left; /* Alinea el texto al centro */
+}
+
+#text1 {
+    color: white;  
+    margin-top: 180px; /* Espacio arriba */
+    font-size: 80px;
+    font-weight: 700;
+    text-shadow: 4px 44px 48px rgba(0, 0, 0, 0.7); /* Sombra al borde del texto */
+    text-align: center; /* Alinea el texto al centro */
+}
+
+audio {
+    display: none; /* Oculta el reproductor de audio */
+}
+
+
+#photo{
+   padding: 2px 2px;
+}
+.photo img {
+    height: 20rem; /* Altura fija para todas las imágenes */
+    width: 100%; /* Ancho completo para que se ajuste al contenedor */
+    object-fit: cover; /* Mantiene la proporción de la imagen */
+    border: 5px solid transparent; /* Borde transparente */
+    box-shadow: 0 0 435px rgba(239, 78, 3, 0.5); /* Sombra dorada fija más grande */
+    transition: box-shadow 0.3s; /* Transición suave para el efecto */
+}
+
+.photo img:hover {
+    box-shadow: 0 0 315px rgba(44, 20, 118, 0.8); /* Sombra amarilla brillante al pasar el ratón */
+}
+.card {
+    border: none; /* Eliminar bordes */
+    overflow: hidden;
+}
+
+.card-img-top {
+    width: 100%;
+    height: 280px;
+    object-fit: cover; /* Recortar la imagen para ajustarse a la card */
+}
+
+@media (min-width: 768px) {
+    .col-md-6 {
+        max-width: 50%;
+        flex: 0 0 50%;
+    }
+    
+}
+
+@media (max-width: 528px) {
+    .simple-text {
+      font-size: 28px; /* Tamaño reducido del texto */
+    }
+  }
+
+.gallery {
+    display: flex; /* Usamos flexbox para la galería */
+    flex-wrap: wrap; /* Permite que los elementos se envuelvan */
+    justify-content: center; /* Centra los elementos en la galería */
+}
+
+footer {
+    background-color: #ffffff; /* Color de fondo del footer */
+    margin: 0; /* Sin margen en el footer */
+    padding: 10px 0; /* Ajusta el padding según lo necesites */
+    flex-shrink: 0; /* Asegura que el footer no se reduzca */
+    height: 60px; /* Ajusta la altura del footer según lo necesites */
+    display: flex; /* Usar flexbox para el layout */
+    justify-content: center; /* Centrar horizontalmente */
+    align-items: center; /* Centrar verticalmente */
+}
+
+footer p {
+    margin: 0; /* Elimina el margen del párrafo */
+}

@@ -1,0 +1,22 @@
+{
+  "name": "collage_of_images",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cloudinary": "^2.5.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-handlebars": "^8.0.1",
+    "hbs": "^4.2.0",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.13.0",
+    "sharp": "^0.33.5"
+  },
+  "description": ""
+}

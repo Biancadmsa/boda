@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería de Fotos - Matrimonio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/style.css"> <!-- Asegúrate de que la ruta sea correcta -->
+</head>
+<body>
+
+
+    <!-- Header -->
+    <header id="inicio" class="hero-section">
+        <div class="container">
+            <h1 id="text"></h1> <!-- Added ID for typing effect -->
+        </div>
+        <div id="text1" class="text-center"></div> 
+    </header>
+
+    <section id="hero-section" class="d-flex align-items-center justify-content-center">
+        <div class="container">
+            <div class="text-center my-1 col-12 col-md-7 mx-auto">
+                <i class="fas fa-dove"></i> ❤️<i class="fas fa-dove"></i> ❤️<i class="fas fa-dove"></i>
+                <h2 class="simple-text"><i class="fas fa-dove white-icon"></i> Bruno and Tomas <i class="fas fa-dove white-icon"></i></h2>
+                <p>Upload your photos and share them with all the guests!</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="upload-section text-center mb-4">
+        <form action="/upload" method="POST" enctype="multipart/form-data" class="form-inline justify-content-center">
+            <label for="photo" class="mr-2">Upload a photo:</label>
+            <input type="file" id="photo" name="photo" accept="image/*" required class="form-control mr-2 p-1">
+            <button type="submit" class="btn btn-info text-white">Upload photo</button>
+        </form>
+    </section>
+
+    <section class="gallery-section">
+        <div class="container-fluid">
+            <div class="gallery-wrapper p-3">
+                <h2 class="text-center">Image gallery</h2>
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4"> <!-- Adjusted for responsiveness -->
+                    {{#each photos}}
+                    <div class="col mt-5">
+                        <div class="card">
+                            <img src="{{this.url}}" alt="Foto del matrimonio de Bruno y Tomas" class="card-img-top img-fluid">
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="/scrollflow.js"></script>
+    <script src="/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
