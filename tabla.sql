@@ -6,5 +6,6 @@ CREATE TABLE photos (
 
 
 SELECT * FROM photos;
+SELECT * FROM photos;
 
 DELETE FROM photos;
