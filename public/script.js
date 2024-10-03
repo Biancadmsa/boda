@@ -1,3 +1,6 @@
+// Script.js
+
+
 window.onload = function() {
     const heroSection = document.querySelector('.hero-section');
     const img = new Image();

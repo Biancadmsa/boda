@@ -1,3 +1,5 @@
+// app.js
+
 const express = require('express');
 const exphbs = require('express-handlebars');
 const multer = require('multer');
@@ -6,6 +8,8 @@ const { Pool } = require('pg');
 const path = require('path');
 const sharp = require('sharp'); // Importar Sharp
 require('dotenv').config();
+const vision = require('@google-cloud/vision');
+const client = new vision.ImageAnnotatorClient();
 
 const app = express();
 
@@ -17,20 +21,6 @@ cloudinary.config({
 });
 
 
-// Configuración de la base de datos PostgreSQL
-// const pool = new Pool({
-//   user: process.env.DB_USER,
-//   host: process.env.DB_HOST,
-//   database: process.env.DB_DATABASE,
-//   password: process.env.DB_PASSWORD,
-//   port: process.env.DB_PORT,
-//   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false // Solo activar SSL en producción
-// // });
-// const pool = new Pool({
-//   connectionString: process.env.DATABASE_URL || `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`,
-//   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-// });
-const { Pool } = require('pg');
 
 // Configuración de la conexión
 const pool = new Pool({
@@ -60,7 +50,6 @@ const testConnection = async () => {
 testConnection();
 
 
-
 // Servir archivos estáticos (CSS, JS del cliente) desde 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -83,6 +72,7 @@ const upload = multer({
   limits: {
     fileSize: 5 * 1024 * 1024 // 5 MB como tamaño máximo
   },
+  
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png|gif/; // Tipos de archivo permitidos
     const mimetype = filetypes.test(file.mimetype);
@@ -91,7 +81,7 @@ const upload = multer({
     if (mimetype && extname) {
       return cb(null, true);
     }
-    cb('file type not allowed error'); // Mensaje de error
+    cb(new Error('Only files with the following extensions are allowed: jpeg, jpg, png, gif')); // Improved error message 
   }
 });
 
@@ -114,44 +104,64 @@ app.get('/', async (req, res) => {
 });
 
 // Ruta de ca// Upload Route: Handle photo uploads
-// Upload Route: Handle photo uploads
 
 app.post('/upload', upload.array('photos', 10), async (req, res) => {
   const files = req.files;
 
   if (!files || files.length === 0) {
-    return res.status(400).send('No files uploaded');
+    return res.status(400).json({ error: '❌No files uploaded. Please select files to upload.❌' });
   }
 
   try {
     const uploadPromises = files.map(async (file) => {
-      const compressedBuffer = await sharp(file.buffer)
-        .resize({ width: 800 })
-        .jpeg({ quality: 80 })
-        .toBuffer();
+      try {
+        // Verificar si la imagen tiene contenido inapropiado
+        const [result] = await client.safeSearchDetection(file.buffer);
+        const detections = result.safeSearchAnnotation;
 
-      const uploadResult = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
-          if (error) {
-            console.error('Error uploading image:', error);
-            return reject('Error uploading image');
-          }
-          resolve(result);
-        }).end(compressedBuffer);
-      });
+        if (detections.adult === 'LIKELY' || detections.adult === 'VERY_LIKELY' ||
+            detections.violence === 'LIKELY' || detections.violence === 'VERY_LIKELY') {
+          throw new Error('❌The image contains inappropriate content❌');
+        }
 
-      const query = 'INSERT INTO photos (url) VALUES ($1)';
-      await pool.query(query, [uploadResult.url]);
+        // Comprimir y subir la imagen si es segura
+        const compressedBuffer = await sharp(file.buffer)
+          .resize({ width: 800 })
+          .jpeg({ quality: 80 })
+          .toBuffer();
+
+        const uploadResult = await new Promise((resolve, reject) => {
+          cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+            if (error) {
+              return reject(new Error('Error uploading image to Cloudinary'));
+            }
+            resolve(result);
+          }).end(compressedBuffer);
+        });
+
+        // Insertar la URL de la imagen en la base de datos
+        const query = 'INSERT INTO photos (url) VALUES ($1)';
+        await pool.query(query, [uploadResult.url]);
+      } catch (err) {
+        console.error(`Error processing file ${file.originalname}:`, err);
+        throw new Error(`Error processing file ${file.originalname}`);
+      }
     });
 
     await Promise.all(uploadPromises);
     res.redirect('/'); // Redirigir a la galería
   } catch (err) {
     console.error('Error processing images:', err);
-    res.status(500).send('Error processing images');
+    res.status(500).json({ error: err.message || 'Error processing images' });
   }
 });
 
+
+// Middleware para manejar errores
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Algo salió mal en el servidor!');
+});
 
 
 
