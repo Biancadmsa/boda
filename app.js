@@ -4,6 +4,7 @@ const express = require('express');
 const exphbs = require('express-handlebars');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
+// Ejemplo de importación correcta
 const { Pool } = require('pg');
 const path = require('path');
 const sharp = require('sharp'); // Importar Sharp
@@ -23,13 +24,21 @@ cloudinary.config({
 
 
 // Configuración de la conexión
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 
-    `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`,
+// const pool = new Pool({
+//   connectionString: process.env.DATABASE_URL || 
+//     `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`,
   
-  // Si estás en producción (Heroku), se requiere SSL, pero no en desarrollo local
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+//   // Si estás en producción (Heroku), se requiere SSL, pero no en desarrollo local
+//   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+// });
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false // Solo para desarrollo; no usar en producción sin más ajustes de seguridad.
+  },
 });
+
 
 // Ejemplo de consulta para probar la conexión
 const testConnection = async () => {
