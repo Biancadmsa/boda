@@ -1,15 +1,17 @@
-// app.js
-
 const express = require('express');
 const exphbs = require('express-handlebars');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
-const { Pool } = require('pg'); // Asegúrate de que solo hay una declaración de Pool
+const { Pool } = require('pg');
 const path = require('path');
-const sharp = require('sharp'); // Importar Sharp
+const sharp = require('sharp');
 require('dotenv').config();
 const vision = require('@google-cloud/vision');
-const client = new vision.ImageAnnotatorClient();
+const cors = require('cors');
+
+const client = new vision.ImageAnnotatorClient({
+  keyFilename: path.join(__dirname, 'google-credentials.json') // Cargar el archivo de credenciales
+});
 
 const app = express();
 
@@ -99,7 +101,7 @@ app.get('/', async (req, res) => {
   }
 });
 
-// Ruta de carga de fotos
+// Ruta de carga de fotos// Ruta de carga de fotos
 app.post('/upload', upload.array('photos', 10), async (req, res) => {
   const files = req.files;
 
@@ -121,9 +123,11 @@ app.post('/upload', upload.array('photos', 10), async (req, res) => {
 
         // Comprimir y subir la imagen si es segura
         const compressedBuffer = await sharp(file.buffer)
-          .resize({ width: 800 })
-          .jpeg({ quality: 80 })
-          .toBuffer();
+  .resize({ width: 1200, height: 675, fit: 'contain' }) // Para 16:9
+  //.resize({ width: 1200, height: 900, fit: 'contain' }) // Para 4:3
+  .jpeg({ quality: 80 })
+  .toBuffer();
+
 
         const uploadResult = await new Promise((resolve, reject) => {
           cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
@@ -151,11 +155,51 @@ app.post('/upload', upload.array('photos', 10), async (req, res) => {
   }
 });
 
+// Ruta para eliminar una foto por ID// Ruta para eliminar una foto por ID
+app.post('/delete-photo/:id', async (req, res) => {
+  const { id } = req.params; // Obtener el ID de la imagen a eliminar
+  console.log('ID de la imagen a eliminar:', id); // Diagnóstico
+
+  try {
+      // Consulta para obtener la URL de la imagen que se va a eliminar
+      const result = await pool.query('SELECT url FROM photos WHERE id = $1', [id]);
+      console.log('Resultado de la consulta:', result); // Diagnóstico
+
+      if (result.rowCount === 0) {
+          return res.status(404).json({ message: 'Image not found' });
+      }
+
+      const imageUrl = result.rows[0].url;
+      console.log('URL de la imagen a eliminar:', imageUrl); // Diagnóstico
+
+      // Eliminar la imagen de Cloudinary
+      const publicId = imageUrl.split('/').pop().split('.')[0]; // Obtiene el ID público de la URL
+      try {
+          await cloudinary.uploader.destroy(publicId);
+          console.log('Imagen eliminada de Cloudinary');
+      } catch (cloudinaryError) {
+          console.error('Error al eliminar de Cloudinary:', cloudinaryError);
+          return res.status(500).json({ message: 'Error al eliminar la imagen de Cloudinary' });
+      }
+
+      // Eliminar la entrada de la base de datos
+      await pool.query('DELETE FROM photos WHERE id = $1', [id]);
+      res.redirect('/'); // Redirigir a la galería después de eliminar
+  } catch (error) {
+      console.error('Error en la ruta de eliminación:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+
+
+
 // Middleware para manejar errores
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Algo salió mal en el servidor!');
 });
+const publicId = imageUrl.split('/').pop().split('.')[0]; // Obtiene el ID público de la URL
 
 // init
 const PORT = process.env.PORT || 3001;

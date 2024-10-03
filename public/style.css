@@ -3,6 +3,9 @@
     height: 100%;
 } */
 
+.photo-counter h3{
+    color: #050505;
+}
 body {
     display: flex;
     flex-direction: column;
@@ -58,10 +61,33 @@ h1{
 .names{
     color: #ffffff; 
     font-size: 80px;
-    margin-top: 150px;
+    margin-top: 150px; 
+}
+
+.form-inline {
+    font-size: 38px; /* Ajusta el tamaño de la fuente según sea necesario */
+    color: black;
+    
+}
+
+.form-inline label {
+    font-size: 40px; /* Tamaño del texto del label */
     
    
 }
+
+.form-inline input {
+    font-size: 30px; /* Tamaño del texto del input */
+    padding: 10px; /* Espaciado interno para que se vea más grande */
+   
+}
+
+.form-inline button {
+    font-size: 25px; /* Tamaño del texto del botón */
+    padding: 10px 20px; /* Espaciado interno para que el botón sea más grande */
+}
+
+
 p{
     font-size: 50px;
 }
@@ -106,6 +132,26 @@ label {
     }
 }
 
+@media (max-width: 480px) {
+    .upload-section .subtitulo {
+        font-size: 38px; /* Tamaño de fuente más pequeño para pantallas de 480px o menos */
+    }
+}
+
+
+@media (max-width: 551px) {
+    p .subtitulo {
+        margin-top: 10px;
+        font-size: 10px; /
+    }
+}
+
+@media (max-width: 452px) {
+    .icons .fecha {
+        font-size: 20px; /* Tamaño de fuente más pequeño */
+    }
+}
+
 #photo {
     padding: 2px 2px;
 }
@@ -141,6 +187,49 @@ label {
     }
 }
 
+@media (max-width: 1003px) {
+    .names {
+        margin-top: 180px; /* Espacio de 10px de margen superior */
+    }
+}
+
+@media (max-width: 505px) {
+    .names {
+        font-size: 60px; /* Ajusta este valor según tus necesidades */
+    }
+}
+@media (max-width: 393px) {
+    .names {
+        font-size: 49px; /* Ajusta este valor según tus necesidades */
+    }
+}
+
+@media (max-width: 550px) {
+    .upload-section .subtitulo {
+        font-size: 40px; /* Tamaño de fuente más pequeño */
+    }
+}
+
+
+@media (max-width: 440px) {
+    .upload-section .subtitulo {
+        font-size: 30px; /* Tamaño de fuente más pequeño */
+    }.form-inline {
+        font-size: 48px; /* Ajusta el tamaño de la fuente según sea necesario */
+    }.form-inline label {
+        font-size: 38px; /* Tamaño del texto del label */ 
+    }.form-inline input {
+        font-size: 25px; /* Tamaño del texto del input */
+    }.form-inline button {
+        font-size: 23px; /* Tamaño del texto del botón */
+    }
+}
+
+
+
+
+
+
 footer {
     margin: 0;
     padding: 10px 0;
@@ -159,12 +248,25 @@ footer p {
     font-size: 20px;
     color: white;
 }
-
-
-.fecha{
+.fecha {
     font-size: 30px;
-    color: rgb(109, 51, 15);
+    color: rgb(255, 255, 255);
+    font-weight: 400;
+    margin-top: 20px;
+    background-color: rgba(217, 185, 155, 0.7); /* Color marrón suave con 70% de opacidad */
+    padding: 10px; /* Espaciado interno */
+    border-radius: 5px; /* Bordes redondeados (opcional) */
 }
+.icons {
+    display: flex;
+    align-items: center; /* Alinea verticalmente los íconos y el texto */
+    justify-content: center; /* Centra horizontalmente el contenido */
+}
+
+.icono {
+    margin: 0 5px; /* Ajusta este valor según tus necesidades */
+}
+
 
 .photo-counter {
     text-align: left;
