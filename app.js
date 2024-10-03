@@ -19,12 +19,16 @@ cloudinary.config({
 // Configuración de la base de datos PostgreSQL
 
 // Configuración de la base de datos PostgreSQL
+// Configuración de la base de datos PostgreSQL
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false // Para conexiones en producción en Heroku
-  }
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false // Solo activar SSL en producción
 });
+
 
 // Servir archivos estáticos (CSS, JS del cliente) desde 'public'
 app.use(express.static(path.join(__dirname, 'public')));
@@ -79,54 +83,47 @@ app.get('/', async (req, res) => {
 });
 
 // Ruta de ca// Upload Route: Handle photo uploads
-app.post('/upload', upload.array('photos', 20), async (req, res) => {
+// Upload Route: Handle photo uploads
+app.post('/upload', upload.array('photos', 10), async (req, res) => {
   const files = req.files;
 
-  // Verifica si se excedió el límite de archivos
   if (!files || files.length === 0) {
-      return res.status(400).send('No files uploaded');
-  }
-
-  if (files.length > 10) {
-      return res.status(400).send('You are exceeding the upload limit of 10 photos.');
+    return res.status(400).send('No files uploaded');
   }
 
   try {
-      // Iterar sobre los archivos subidos
-      for (const file of files) {
-          // Comprimir la imagen usando Sharp
-          const compressedBuffer = await sharp(file.buffer)
-              .resize({ width: 800 }) // Ajusta el tamaño si es necesario
-              .jpeg({ quality: 80 }) // Ajusta la calidad de la imagen
-              .toBuffer();
+    for (const file of files) {
+      const compressedBuffer = await sharp(file.buffer)
+        .resize({ width: 800 })
+        .jpeg({ quality: 80 })
+        .toBuffer();
 
-          // Subir imagen comprimida a Cloudinary
-          await new Promise((resolve, reject) => {
-              cloudinary.uploader.upload_stream({ resource_type: 'image' }, async (error, result) => {
-                  if (error) {
-                      console.error('Error uploading image:', error);
-                      return reject('Error uploading image');
-                  }
+      await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream({ resource_type: 'image' }, async (error, result) => {
+          if (error) {
+            console.error('Error uploading image:', error);
+            return reject('Error uploading image');
+          }
 
-                  // Almacenar URL de imagen en PostgreSQL database
-                  try {
-                      const query = 'INSERT INTO photos (url) VALUES ($1)';
-                      await pool.query(query, [result.url]);
-                      resolve(); // Resolución de la promesa
-                  } catch (err) {
-                      console.error('Error saving image to database:', err);
-                      reject('Error saving image to database');
-                  }
-              }).end(compressedBuffer);
-          });
-      }
+          try {
+            const query = 'INSERT INTO photos (url) VALUES ($1)';
+            await pool.query(query, [result.url]);
+            resolve();
+          } catch (err) {
+            console.error('Error saving image to database:', err);
+            reject('Error saving image to database');
+          }
+        }).end(compressedBuffer);
+      });
+    }
 
-      res.redirect('/'); // Redirigir a la galería
+    res.redirect('/'); // Redirigir a la galería
   } catch (err) {
-      console.error('Error processing images:', err);
-      res.status(500).send('Error processing images');
+    console.error('Error processing images:', err);
+    res.status(500).send('Error processing images');
   }
 });
+
 
 
 
