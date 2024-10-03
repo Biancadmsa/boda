@@ -10,6 +10,7 @@ body {
     color: rgb(0, 0, 0); /* Color de texto por defecto */
     font-family: 'Dancing Script', cursive;
     font-size: 40px;
+    background-color: burlywood;
     background-image: url("/image/fondo.webp");
     opacity: 0.8;
 }
