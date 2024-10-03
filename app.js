@@ -22,14 +22,14 @@ cloudinary.config({
 
 
 
-// Configuración de la conexión
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 
-    `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`,
-  
-  // Si estás en producción (Heroku), se requiere SSL, pero no en desarrollo local
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false // Solo para desarrollo; no usar en producción sin más ajustes de seguridad.
+  },
 });
+
 
 // Ejemplo de consulta para probar la conexión
 const testConnection = async () => {
@@ -48,6 +48,7 @@ const testConnection = async () => {
 };
 
 testConnection();
+
 
 
 // Servir archivos estáticos (CSS, JS del cliente) desde 'public'
