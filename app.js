@@ -4,7 +4,7 @@ const express = require('express');
 const exphbs = require('express-handlebars');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
-const { Pool } = require('pg');
+const { Pool } = require('pg'); // Asegúrate de que solo hay una declaración de Pool
 const path = require('path');
 const sharp = require('sharp'); // Importar Sharp
 require('dotenv').config();
@@ -20,16 +20,13 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-
-
-
+// Configuración de la conexión
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false // Solo para desarrollo; no usar en producción sin más ajustes de seguridad.
   },
 });
-
 
 // Ejemplo de consulta para probar la conexión
 const testConnection = async () => {
@@ -48,8 +45,6 @@ const testConnection = async () => {
 };
 
 testConnection();
-
-
 
 // Servir archivos estáticos (CSS, JS del cliente) desde 'public'
 app.use(express.static(path.join(__dirname, 'public')));
@@ -104,8 +99,7 @@ app.get('/', async (req, res) => {
   }
 });
 
-// Ruta de ca// Upload Route: Handle photo uploads
-
+// Ruta de carga de fotos
 app.post('/upload', upload.array('photos', 10), async (req, res) => {
   const files = req.files;
 
@@ -157,16 +151,11 @@ app.post('/upload', upload.array('photos', 10), async (req, res) => {
   }
 });
 
-
 // Middleware para manejar errores
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Algo salió mal en el servidor!');
 });
-
-
-
-
 
 // init
 const PORT = process.env.PORT || 3001;
