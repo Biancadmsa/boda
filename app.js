@@ -130,8 +130,8 @@ app.post('/upload', upload.array('photos', 20), async (req, res) => {
 
 
 
-// Iniciar el servidor
-const PORT = process.env.PORT || 3000;
+// init
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server listening on port http://localhost:${PORT}`);
 });
