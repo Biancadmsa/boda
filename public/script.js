@@ -1,51 +1,46 @@
+window.onload = function() {
+    const heroSection = document.querySelector('.hero-section');
+    const img = new Image();
+    img.src = '/image/boda2.webp';
+    img.onload = function() {
+        heroSection.style.backgroundImage = 'url("/image/boda2.webp")';
+    };
+};
 
+document.querySelector('form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Evita el comportamiento por defecto de envío para mostrar el alert primero
+    
+    // Crea un objeto FormData para enviar los datos del formulario
+    const formData = new FormData(this);
 
-let i = 0;
-let text = "Our Wedding";
-setTimeout(function typing() {
-    if (i < text.length) {
-        document.getElementById('text').innerHTML += text.charAt(i);
-        i++;
-        setTimeout(typing, 90);
-    }
-}, 1500);
+    // Enviar la solicitud con fetch
+    fetch(this.action, {
+        method: 'POST',
+        body: formData
+    }).then(response => {
+        if (response.ok) {
+            const message = '"Thank you so much! You are wonderful, and we appreciate you joining us at our wedding😊🎉!!!!"';
+            alert(message); // Mostrar el alert
 
-$(document).ready(function () {
-    new ScrollFlow();
-});
+            // Recargar la página después de cerrar el alert
+            setTimeout(() => {
+                window.onload(); // Simular el evento onload
+                location.reload(); // Recargar la página
+            }, 100); // Esperar un breve momento (100 ms)
 
-
-let i1 = 0;
-let text1 ='" Bruno and Tomas "';
-setTimeout(function typing() {
-    if (i1 < text1.length) {
-        document.getElementById('text1').innerHTML += text1.charAt(i1);
-        i1++;
-        setTimeout(typing, 90);
-    }
-}, 1500);
-
-$(document).ready(function () {
-    new ScrollFlow();
-});
-
- // Reproduce el audio automáticamente después de un breve retraso
- document.addEventListener("DOMContentLoaded", function () {
-    var audio = document.getElementById("background-music");
-    audio.volume = 0.3; // Ajusta el volumen a un nivel más audible
-    audio.play().catch(function(error) {
-        console.log('Error al intentar reproducir el audio: ', error);
-    });
-
-    // Control de reproducción y pausa
-    var playPauseButton = document.getElementById("play-pause");
-    playPauseButton.addEventListener("click", function () {
-        if (audio.paused) {
-            audio.play();
-            playPauseButton.textContent = "Pause Music"; // Cambiar el texto del botón
+            this.reset(); // Opcional: restablece el formulario después del envío
         } else {
-            audio.pause();
-            playPauseButton.textContent = "Play Music"; // Cambiar el texto del botón
+            alert("Oops! Something went wrong. Please try again.");
         }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert("There was an error uploading the photo. Please try again.");
     });
+});
+
+document.getElementById('photos').addEventListener('change', function() {
+    if (this.files.length > 10) {
+        alert("You can only upload a maximum of 10 photos.");
+        this.value = ""; // Limpiar el campo de entrada
+    }
 });

@@ -9,14 +9,14 @@ require('dotenv').config();
 
 const app = express();
 
-// Cloudinary Configuration (using .env)
+// Configuración de Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-// PostgreSQL Database Configuration (using .env)
+// Configuración de la base de datos PostgreSQL
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -25,10 +25,10 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
-// Serve static files (CSS, client-side JS) from 'public'
+// Servir archivos estáticos (CSS, JS del cliente) desde 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Handlebars template engine setup
+// Configuración del motor de plantillas Handlebars
 app.engine(
   "hbs",
   exphbs.engine({
@@ -40,7 +40,7 @@ app.engine(
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 
-// Multer for handling file uploads (in-memory storage)
+// Multer para manejar cargas de archivos (almacenamiento en memoria)
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
@@ -59,57 +59,78 @@ const upload = multer({
   }
 });
 
-// Home Route: Display photo gallery
+// Ruta de inicio: Mostrar la galería de fotos
 app.get('/', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM photos ORDER BY id DESC');
     const photos = result.rows;
-    res.render('index', { photos });
+
+    // Consulta para contar el número total de fotos
+    const photoCountResult = await pool.query('SELECT COUNT(*) FROM photos');
+    const photoCount = photoCountResult.rows[0].count; // Obtener el número de fotos subidas
+    console.log('Número de fotos subidas:', photoCount);
+
+    res.render('index', { photos, photoCount }); // Pasar las fotos y el contador a la plantilla
   } catch (error) {
     console.error('Error loading photos:', error);
     res.status(500).send('Error loading photos');
   }
 });
 
-// Upload Route: Handle photo uploads
-app.post('/upload', upload.single('photo'), async (req, res) => {
-  const file = req.file;
+// Ruta de ca// Upload Route: Handle photo uploads
+app.post('/upload', upload.array('photos', 20), async (req, res) => {
+  const files = req.files;
 
-  if (!file) {
-    return res.status(400).send('No file uploaded');
+  // Verifica si se excedió el límite de archivos
+  if (!files || files.length === 0) {
+      return res.status(400).send('No files uploaded');
+  }
+
+  if (files.length > 10) {
+      return res.status(400).send('You are exceeding the upload limit of 10 photos.');
   }
 
   try {
-    // Comprimir la imagen usando Sharp
-    const compressedBuffer = await sharp(file.buffer)
-      .resize({ width: 800 }) // Ajusta el tamaño si es necesario
-      .jpeg({ quality: 80 }) // Ajusta la calidad de la imagen
-      .toBuffer();
+      // Iterar sobre los archivos subidos
+      for (const file of files) {
+          // Comprimir la imagen usando Sharp
+          const compressedBuffer = await sharp(file.buffer)
+              .resize({ width: 800 }) // Ajusta el tamaño si es necesario
+              .jpeg({ quality: 80 }) // Ajusta la calidad de la imagen
+              .toBuffer();
 
-    // Subir imagen comprimida a Cloudinary
-    cloudinary.uploader.upload_stream({ resource_type: 'image' }, async (error, result) => {
-      if (error) {
-        console.error('Error uploading image:', error);
-        return res.status(500).send('Error uploading image');
+          // Subir imagen comprimida a Cloudinary
+          await new Promise((resolve, reject) => {
+              cloudinary.uploader.upload_stream({ resource_type: 'image' }, async (error, result) => {
+                  if (error) {
+                      console.error('Error uploading image:', error);
+                      return reject('Error uploading image');
+                  }
+
+                  // Almacenar URL de imagen en PostgreSQL database
+                  try {
+                      const query = 'INSERT INTO photos (url) VALUES ($1)';
+                      await pool.query(query, [result.url]);
+                      resolve(); // Resolución de la promesa
+                  } catch (err) {
+                      console.error('Error saving image to database:', err);
+                      reject('Error saving image to database');
+                  }
+              }).end(compressedBuffer);
+          });
       }
 
-      // Almacenar URL de imagen en PostgreSQL database
-      try {
-        const query = 'INSERT INTO photos (url) VALUES ($1)';
-        await pool.query(query, [result.url]);
-        res.redirect('/'); // Redirigir a la galería
-      } catch (err) {
-        console.error('Error saving image to database:', err);
-        res.status(500).send('Error saving image to database');
-      }
-    }).end(compressedBuffer);
+      res.redirect('/'); // Redirigir a la galería
   } catch (err) {
-    console.error('Error compressing image:', err);
-    res.status(500).send('Error compressing image');
+      console.error('Error processing images:', err);
+      res.status(500).send('Error processing images');
   }
 });
 
-// Start Server
+
+
+
+// Iniciar el servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server listening on port http://localhost:${PORT}`);

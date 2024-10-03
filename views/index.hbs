@@ -6,48 +6,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galería de Fotos - Matrimonio</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/style.css"> <!-- Asegúrate de que la ruta sea correcta -->
 </head>
+
 <body>
-
-
     <!-- Header -->
-    <header id="inicio" class="hero-section">
-        <div class="container">
-            <h1 id="text"></h1> <!-- Added ID for typing effect -->
-        </div>
-        <div id="text1" class="text-center"></div> 
-    </header>
-
-    <section id="hero-section" class="d-flex align-items-center justify-content-center">
-        <div class="container">
-            <div class="text-center my-1 col-12 col-md-7 mx-auto">
-                <i class="fas fa-dove"></i> ❤️<i class="fas fa-dove"></i> ❤️<i class="fas fa-dove"></i>
-                <h2 class="simple-text"><i class="fas fa-dove white-icon"></i> Bruno and Tomas <i class="fas fa-dove white-icon"></i></h2>
-                <p>Upload your photos and share them with all the guests!</p>
+    <header class="hero-section d-flex align-items-center justify-content-center">
+    <div class="container">
+        <div class="text-center my-1 col-12 col-md-7 mx-auto">
+            <div class="brunoytomas" style="height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+                <h2 class="names">Bruno & Tomas</h2>
+                <!-- Colocamos los íconos después del h2 y dentro del mismo contenedor -->
+                <div class="icons mt-2"> <!-- Clase para agregar un margen superior opcional -->
+                    <i class="fas fa-dove"></i>❤️<i class="fas fa-dove"> </i> <p class="fecha">"October 5, 2024" </p><i class="fas fa-dove"></i>❤️<i class="fas fa-dove"></i>
+                </div>
             </div>
         </div>
-    </section>
+    </div>
+</header>
 
+
+    <!-- Upload Section -->
     <section class="upload-section text-center mb-4">
-        <form action="/upload" method="POST" enctype="multipart/form-data" class="form-inline justify-content-center">
-            <label for="photo" class="mr-2">Upload a photo:</label>
-            <input type="file" id="photo" name="photo" accept="image/*" required class="form-control mr-2 p-1">
-            <button type="submit" class="btn btn-info text-white">Upload photo</button>
-        </form>
-    </section>
+        <div>
+            <p class="subtitulo">"Upload your photos and share them with all the guests!"</p>
+        </div>
 
+      <form action="/upload" method="POST" enctype="multipart/form-data" class="form-inline justify-content-center">
+    <label for="photos" class="mr-2">"Upload photos"</label>
+    <input type="file" id="photos" name="photos" accept="image/*" required multiple class="form-control mr-2 p-1">
+    <button type="submit" class="btn btn-info text-white">Subir fotos</button>
+</form>
+
+
+<div>  
+    <div class="photo-counter">
+    <h3>Total Photos Uploaded: {{photoCount}}</h3>
+</div>
+</div>
+
+    <div>
+        <h2 class="text-center">Image Gallery:</h2>
+    </div>
+    <!-- Gallery Section -->
+    
     <section class="gallery-section">
         <div class="container-fluid">
             <div class="gallery-wrapper p-3">
-                <h2 class="text-center">Image gallery</h2>
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4"> <!-- Adjusted for responsiveness -->
+
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
                     {{#each photos}}
                     <div class="col mt-5">
                         <div class="card">
-                            <img src="{{this.url}}" alt="Foto del matrimonio de Bruno y Tomas" class="card-img-top img-fluid">
+                            <img src="{{this.url}}" alt="Foto del matrimonio de Bruno y Tomas"
+                                class="card-img-top img-fluid">
                         </div>
                     </div>
                     {{/each}}
