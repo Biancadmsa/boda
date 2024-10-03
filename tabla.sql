@@ -10,6 +10,10 @@ CREATE TABLE photos (
     url VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS photos (
+    id SERIAL PRIMARY KEY,
+    url TEXT NOT NULL
+);
 
 
 \d photos

@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/vision": "^4.3.2",
     "cloudinary": "^2.5.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",

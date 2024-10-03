@@ -25,11 +25,39 @@ cloudinary.config({
 //   password: process.env.DB_PASSWORD,
 //   port: process.env.DB_PORT,
 //   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false // Solo activar SSL en producción
+// // });
+// const pool = new Pool({
+//   connectionString: process.env.DATABASE_URL || `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`,
+//   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 // });
+const { Pool } = require('pg');
+
+// Configuración de la conexión
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`,
+  connectionString: process.env.DATABASE_URL || 
+    `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`,
+  
+  // Si estás en producción (Heroku), se requiere SSL, pero no en desarrollo local
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
+
+// Ejemplo de consulta para probar la conexión
+const testConnection = async () => {
+  try {
+    const client = await pool.connect();
+    console.log('Conexión exitosa a la base de datos');
+    
+    // Prueba con una consulta
+    const res = await client.query('SELECT NOW()');
+    console.log('Fecha actual:', res.rows);
+
+    client.release();  // Libera el cliente cuando termines
+  } catch (err) {
+    console.error('Error de conexión a la base de datos:', err);
+  }
+};
+
+testConnection();
 
 
 
@@ -87,6 +115,7 @@ app.get('/', async (req, res) => {
 
 // Ruta de ca// Upload Route: Handle photo uploads
 // Upload Route: Handle photo uploads
+
 app.post('/upload', upload.array('photos', 10), async (req, res) => {
   const files = req.files;
 
@@ -95,37 +124,34 @@ app.post('/upload', upload.array('photos', 10), async (req, res) => {
   }
 
   try {
-    for (const file of files) {
+    const uploadPromises = files.map(async (file) => {
       const compressedBuffer = await sharp(file.buffer)
         .resize({ width: 800 })
         .jpeg({ quality: 80 })
         .toBuffer();
 
-      await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload_stream({ resource_type: 'image' }, async (error, result) => {
+      const uploadResult = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
           if (error) {
             console.error('Error uploading image:', error);
             return reject('Error uploading image');
           }
-
-          try {
-            const query = 'INSERT INTO photos (url) VALUES ($1)';
-            await pool.query(query, [result.url]);
-            resolve();
-          } catch (err) {
-            console.error('Error saving image to database:', err);
-            reject('Error saving image to database');
-          }
+          resolve(result);
         }).end(compressedBuffer);
       });
-    }
 
+      const query = 'INSERT INTO photos (url) VALUES ($1)';
+      await pool.query(query, [uploadResult.url]);
+    });
+
+    await Promise.all(uploadPromises);
     res.redirect('/'); // Redirigir a la galería
   } catch (err) {
     console.error('Error processing images:', err);
     res.status(500).send('Error processing images');
   }
 });
+
 
 
 
