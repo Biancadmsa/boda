@@ -23,3 +23,4 @@ SELECT * FROM photos;
 
 
 DELETE FROM photos;
+ALTER TABLE photos ADD CONSTRAINT unique_url UNIQUE (url);

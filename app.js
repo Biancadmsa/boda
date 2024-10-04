@@ -125,6 +125,18 @@ app.post('/upload', upload.array('photos', 10), async (req, res) => {
   }
 
   try {
+    // Obtener URLs existentes de la base de datos para evitar duplicados
+    const existingPhotosResult = await pool.query('SELECT url FROM photos');
+    const existingPhotoUrls = existingPhotosResult.rows.map(row => row.url);
+    
+    // Filtrar archivos que ya existen en la base de datos
+    const duplicates = files.filter(file => existingPhotoUrls.includes(file.originalname));
+    
+    if (duplicates.length > 0) {
+      // Enviar un mensaje de error si hay fotos duplicadas
+      return res.status(400).json({ error: '❌ Duplicate images detected. Please upload new images. ❌' });
+    }
+
     const uploadPromises = files.map(async (file) => {
       try {
         // Verificar si la imagen tiene contenido inapropiado
@@ -155,8 +167,8 @@ app.post('/upload', upload.array('photos', 10), async (req, res) => {
         const query = 'INSERT INTO photos (url) VALUES ($1)';
         await pool.query(query, [uploadResult.url]);
       } catch (err) {
-        console.error('Error processing file ${file.originalname}:, err');
-        throw new Error('Error processing file ${file.originalname}');
+        console.error(`Error processing file ${file.originalname}:`, err);
+        throw new Error(`Error processing file ${file.originalname}`);
       }
     });
 
@@ -167,6 +179,7 @@ app.post('/upload', upload.array('photos', 10), async (req, res) => {
     res.status(500).json({ error: err.message || 'Error processing images' });
   }
 });
+
 
 // Ruta para cerrar sesión
 app.post('/logout', (req, res) => {
@@ -181,7 +194,7 @@ function isAdmin(req, res, next) {
     return res.status(403).send('You do not have permission to access this section..');
   }
   
-  if (req.session.user.username !== 'admin') { // Verificar que el nombre de usuario sea 'admin'
+  if (req.session.user.username !== 'admin') { // Verificar que el nombre de usuario 
     return res.status(403).send('You do not have permission to access this section.');
   }
   
@@ -190,10 +203,10 @@ function isAdmin(req, res, next) {
 
 // Ruta para iniciar sesión
 app.post('/login', (req, res) => {
-  const { username, password } = req.body; // Asegúrate de tener un formulario que envíe estos datos
+  const { username, password } = req.body; 
 
-  // Aquí debes verificar el nombre de usuario y la contraseña
-  if (username === 'admin' && password === 'tomas2411') { // Cambia esto a tu lógica de autenticación
+  // verificar el nombre de usuario y la contraseña
+  if (username === 'admin' && password === 'tomas2411') { 
     req.session.user = { username }; // Guardar información del usuario en la sesión
     return res.redirect('/'); // Redirigir a la página principal
   }
@@ -267,7 +280,7 @@ app.delete('/delete-photo/:id', isAdmin, async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-// Iniciar el servidor
+
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 3000;

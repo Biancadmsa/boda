@@ -326,3 +326,69 @@ form .login-form {
     background-color: rgba(229, 160, 70, 0.8);
 
 }
+
+.modal-header {
+    background-color: rgba(226, 218, 208, 0.9); /* Color beige claro */
+    text-align: center; /* Centra el texto */
+    justify-content: center; /* Centra el contenido horizontalmente */
+    border-bottom: none; /* Si quieres quitar el borde inferior del modal */
+}
+
+.modal-title {
+    color: black; /* Cambia el color de la letra a negro */
+    font-size: 24px; /* Ajusta el tamaño del texto si es necesario */
+    font-weight: bold; /* Puedes agregar este para que el texto sea más grueso */
+}
+
+.modal-header .btn-close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: black; /* Cambia el color del botón de cierre */
+}
+
+.modal-body {
+    padding: 0;
+    margin: 0;
+}
+
+@media (max-width: 505px) {
+    .modal-title{
+        font-size: 15px; /* Tamaño de fuente más pequeño */
+    }
+}
+
+.btn-close {
+    width: 20px; /* Ajusta el ancho del botón */
+    height: 20px; /* Ajusta la altura del botón */
+    font-size: 0.8rem; /* Ajusta el tamaño de la fuente si es necesario */
+    padding: 0; /* Quita el padding para que sea más pequeño */
+}
+
+.login-admi {
+    margin-top: 20px; /* Ajusta este valor según sea necesario */
+}
+
+.btn {
+    margin-top: 10px; /* Espacio entre el botón y los inputs, si es necesario */
+}
+input.form-control {
+    margin-bottom: 10px; /* Espacio entre los inputs y el botón */
+}
+
+.form-inline input[type="file"] {
+    max-width: 70%; /* Ajusta el ancho máximo según lo que necesites */
+    width: 70%; /* Asegúrate de que el ancho sea automático */
+    display: inline-block; /* Muestra el input como un bloque en línea */
+}
+
+.form-inline {
+    justify-content: center; /* Centra los elementos dentro del formulario */
+}
+
+.form-inline .form-group {
+    display: flex;
+    flex-direction: column; /* Alinea los elementos en columna */
+    align-items: center; /* Centra los elementos horizontalmente */
+    text-align: center; /* Centra el texto dentro del label */
+}
