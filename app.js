@@ -125,18 +125,6 @@ app.post('/upload', upload.array('photos', 10), async (req, res) => {
   }
 
   try {
-    // Obtener URLs existentes de la base de datos para evitar duplicados
-    const existingPhotosResult = await pool.query('SELECT url FROM photos');
-    const existingPhotoUrls = existingPhotosResult.rows.map(row => row.url);
-    
-    // Filtrar archivos que ya existen en la base de datos
-    const duplicates = files.filter(file => existingPhotoUrls.includes(file.originalname));
-    
-    if (duplicates.length > 0) {
-      // Enviar un mensaje de error si hay fotos duplicadas
-      return res.status(400).json({ error: '❌ Duplicate images detected. Please upload new images. ❌' });
-    }
-
     const uploadPromises = files.map(async (file) => {
       try {
         // Verificar si la imagen tiene contenido inapropiado
@@ -167,8 +155,8 @@ app.post('/upload', upload.array('photos', 10), async (req, res) => {
         const query = 'INSERT INTO photos (url) VALUES ($1)';
         await pool.query(query, [uploadResult.url]);
       } catch (err) {
-        console.error(`Error processing file ${file.originalname}:`, err);
-        throw new Error(`Error processing file ${file.originalname}`);
+        console.error('Error processing file ${file.originalname}:, err');
+        throw new Error('Error processing file ${file.originalname}');
       }
     });
 
@@ -179,7 +167,6 @@ app.post('/upload', upload.array('photos', 10), async (req, res) => {
     res.status(500).json({ error: err.message || 'Error processing images' });
   }
 });
-
 
 // Ruta para cerrar sesión
 app.post('/logout', (req, res) => {

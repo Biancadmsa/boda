@@ -42,16 +42,13 @@
         <div>
             <p class="subtitulo">"Upload your photos and share them with all the guests!"</p>
         </div>
-    <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data" class="form-inline justify-content-center">
+        <form action="/upload" method="POST" enctype="multipart/form-data" class="form-inline justify-content-center">
     <div class="form-group text-center">
         <label for="photos">"Upload Photos"</label>
         <input type="file" id="photos" name="photos" accept="image/*" required multiple class="form-control w-80">
         <button type="submit" class="btn btn-info text-white mt-2">Upload Photos</button>
     </div>
 </form>
-
-
-
 
         <div>
             <div class="photo-counter">

@@ -143,31 +143,3 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 }
 
 
-
-// script.js
-
-// script.js
-
-document.getElementById('uploadForm').addEventListener('submit', function(event) {
-  event.preventDefault(); // Evitar el envío del formulario por defecto
-
-  const formData = new FormData(this); // Obtener los datos del formulario
-
-  fetch('/upload', {
-      method: 'POST',
-      body: formData, // Asegúrate de enviar los archivos en un FormData
-  })
-  .then(response => response.json())
-  .then(data => {
-      if (data.error) {
-          alert(data.error); // Mostrar el mensaje de error en una alerta
-      } else {
-          window.location.href = '/'; // Redirigir a la galería si no hay error
-      }
-  })
-  .catch(error => {
-      console.error('Error:', error);
-      alert('❌ An error occurred while uploading the images. ❌');
-  });
-});
-
