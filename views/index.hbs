@@ -14,15 +14,16 @@
 </head>
 
 <body>
+
+
     <!-- Header -->
     <header class="hero-section d-flex align-items-center justify-content-center">
-        <div class="container">
+        <div class="containeruno">
             <div class="text-center my-1 col-12 col-md-7 mx-auto">
                 <div class="brunoytomas"
-                    style="height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column; margin-top:20px;">
-                    <h2 class="names">Bruno & Tomas</h2>
-                    <!-- Colocamos los íconos después del h2 y dentro del mismo contenedor -->
-                    <div class="icons mt-2"> <!-- Clase para agregar un margen superior opcional -->
+                    style="height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+                    <h1 class="names">Bruno & Tomas</h1>
+                    <div class="icons mt-2">
                         <i class="fas fa-dove icono"></i>❤️<i class="fas fa-dove icono"></i>
                         <p class="fecha">"October 5, 2024"</p>
                         <i class="fas fa-dove icono"></i>❤️<i class="fas fa-dove icono"></i>
@@ -31,6 +32,7 @@
             </div>
         </div>
     </header>
+
 
 
     <!-- Upload Section -->
@@ -44,6 +46,7 @@
             <input type="file" id="photos" name="photos" accept="image/*" required multiple
                 class="form-control mr-2 p-1">
             <button type="submit" class="btn btn-info text-white">Upload Photos</button>
+
         </form>
 
 
@@ -63,22 +66,40 @@
             <div class="container-fluid">
                 <div class="gallery-wrapper p-3">
                     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
-                       <!-- Ejemplo de botón de eliminar dentro del bucle de fotos -->
-{{#each photos}}
-<div class="col mt-5">
-    <div class="card">
-        <img src="{{this.url}}" alt="Foto del matrimonio de Bruno y Tomas" class="card-img-top img-fluid">
-        <form action="/delete-photo/{{this.id}}" method="POST">
-            <button type="submit" class="btn btn-danger">Eliminar</button>
-        </form>
-    </div>
-</div>
-{{/each}}
+                        <!-- Ejemplo de botón de eliminar dentro del bucle de fotos -->
+                        {{#each photos}}
+                        <div class="col mt-5">
+                            <div class="card">
+                                <img src="{{this.url}}" alt="Foto del matrimonio de Bruno y Tomas"
+                                    class="card-img-top img-fluid">
+                                <form action="/delete-photo/{{this.id}}" method="POST" id="formdelet"
+                                    onsubmit="return confirmDelete(event)">
+                                    <button type="submit" class="btn btn-danger custom-delete-btn">Delete</button>
+                                </form>
 
+                            </div>
+                        </div>
+                        {{/each}}
                     </div>
                 </div>
             </div>
         </section>
+        <div class="container">
+    <section class="login-admi">
+        {{#if user}} <!-- Verifica si el usuario está logueado -->
+            <form id="logoutForm" action="/logout" method="POST" class="logout-form">
+                <button type="submit" id="logoutButton">Logout</button>
+            </form>
+        {{else}}
+            <form id="loginForm" action="/login" method="POST" class="login-form">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit" id="authButton">Login</button>
+            </form>
+        {{/if}}
+    </section>
+</div>
+
 
         <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
         <script src="/scrollflow.js"></script>

@@ -1,11 +1,12 @@
 /* style.css */
-/* html, body {
+html, body {
     height: 100%;
-} */
+}
 
-.photo-counter h3{
+.photo-counter h3 {
     color: #050505;
 }
+
 body {
     display: flex;
     flex-direction: column;
@@ -39,18 +40,20 @@ header, .upload-section, .gallery-section, footer {
     color: rgb(109, 51, 15);
     font-size: 20px;
 }
-
-h1{
-    color: rgb(255, 255, 255);
+h1 {
     font-family: 'Dancing Script';
     font-weight: 600;
-    text-align: left;
     text-shadow: 4px 4px 18px rgba(0, 0, 0, 0.7);
-    color: #ffffff;
-    
+    font-size: 100px; /* Ajusta este valor según el tamaño deseado */
+    color: #ffffff; /* Color de texto */
+    margin-top: 150px; 
+    white-space: nowrap; /* Evita que el texto se divida en múltiples líneas */
+    overflow: hidden; /* Oculta el desbordamiento del texto */
+    text-overflow: ellipsis; /* Muestra puntos suspensivos (...) si el texto se desborda */
 }
 
-.brunoytomas{
+
+.brunoytomas {
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -58,28 +61,44 @@ h1{
     color: #ffffff;
 }
 
-.names{
-    color: #ffffff; 
-    font-size: 80px;
-    margin-top: 150px; 
+
+.fecha {
+    font-size: 30px; /* Aumenta este tamaño si es necesario */
+    color: rgb(255, 255, 255);
+    font-weight: 400;
+    margin-top: 20px;
+    background-color: rgba(217, 185, 155, 0.7); /* Color marrón suave con 70% de opacidad */
+    padding: 10px; /* Espaciado interno */
+    border-radius: 5px; /* Bordes redondeados (opcional) */
+    white-space: nowrap; /* Evita que el texto se divida en múltiples líneas */
+    overflow: hidden; 
 }
+
+.icons {
+    display: flex;
+    align-items: center; /* Alinea verticalmente los íconos y el texto */
+    justify-content: center; /* Centra horizontalmente el contenido */
+}
+
+.icono {
+    margin: 0 2px; 
+    white-space: nowrap; /* Evita que el texto se divida en múltiples líneas */
+    overflow: hidden; /* Ajusta este valor según tus necesidades */
+}
+
 
 .form-inline {
     font-size: 38px; /* Ajusta el tamaño de la fuente según sea necesario */
     color: black;
-    
 }
 
 .form-inline label {
     font-size: 40px; /* Tamaño del texto del label */
-    
-   
 }
 
 .form-inline input {
     font-size: 30px; /* Tamaño del texto del input */
     padding: 10px; /* Espaciado interno para que se vea más grande */
-   
 }
 
 .form-inline button {
@@ -87,8 +106,7 @@ h1{
     padding: 10px 20px; /* Espaciado interno para que el botón sea más grande */
 }
 
-
-p{
+p {
     font-size: 50px;
 }
 
@@ -101,7 +119,7 @@ h2 {
 }
 
 form {
-    border: 2px solid white;
+    border: 1px solid white;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
@@ -138,11 +156,10 @@ label {
     }
 }
 
-
 @media (max-width: 551px) {
     p .subtitulo {
         margin-top: 10px;
-        font-size: 10px; /
+        font-size: 10px; /* Asegúrate de que este valor sea adecuado */
     }
 }
 
@@ -187,17 +204,12 @@ label {
     }
 }
 
-@media (max-width: 1003px) {
-    .names {
-        margin-top: 180px; /* Espacio de 10px de margen superior */
-    }
-}
-
 @media (max-width: 505px) {
     .names {
         font-size: 60px; /* Ajusta este valor según tus necesidades */
     }
 }
+
 @media (max-width: 393px) {
     .names {
         font-size: 49px; /* Ajusta este valor según tus necesidades */
@@ -210,25 +222,27 @@ label {
     }
 }
 
-
 @media (max-width: 440px) {
     .upload-section .subtitulo {
         font-size: 30px; /* Tamaño de fuente más pequeño */
-    }.form-inline {
+    }
+    
+    .form-inline {
         font-size: 48px; /* Ajusta el tamaño de la fuente según sea necesario */
-    }.form-inline label {
+    }
+    
+    .form-inline label {
         font-size: 38px; /* Tamaño del texto del label */ 
-    }.form-inline input {
+    }
+    
+    .form-inline input {
         font-size: 25px; /* Tamaño del texto del input */
-    }.form-inline button {
+    }
+    
+    .form-inline button {
         font-size: 23px; /* Tamaño del texto del botón */
     }
 }
-
-
-
-
-
 
 footer {
     margin: 0;
@@ -244,36 +258,71 @@ footer p {
     margin: 0;
 }
 
-.footerp{
+.footerp {
     font-size: 20px;
     color: white;
 }
-.fecha {
-    font-size: 30px;
-    color: rgb(255, 255, 255);
-    font-weight: 400;
-    margin-top: 20px;
-    background-color: rgba(217, 185, 155, 0.7); /* Color marrón suave con 70% de opacidad */
-    padding: 10px; /* Espaciado interno */
-    border-radius: 5px; /* Bordes redondeados (opcional) */
-}
-.icons {
-    display: flex;
-    align-items: center; /* Alinea verticalmente los íconos y el texto */
-    justify-content: center; /* Centra horizontalmente el contenido */
-}
-
-.icono {
-    margin: 0 5px; /* Ajusta este valor según tus necesidades */
-}
-
 
 .photo-counter {
     text-align: left;
     padding-left: 10px;
     margin-top: 20px;
-  }
-  
-  h3{
-    color:rgb(171, 85, 34)
-  }
+}
+
+h3 {
+    color: rgb(171, 85, 34);
+}
+
+.container {
+    justify-content: center; /* Centrar horizontalmente */
+    align-items: center; /* Centrar verticalmente */
+    height: 50vh; /* Altura completa de la ventana */
+    margin: 50px auto; /* Asegurarse de que no haya márgenes en el contenedor */
+}
+
+.login-admi {
+    display: flex; /* Habilitar flexbox */
+    justify-content: center; /* Centrar horizontalmente el contenido */
+    align-items: center; /* Centrar verticalmente el contenido */
+    width: 100%; /* Ancho completo del contenedor */
+}
+
+form .login-form {
+    width: auto;
+    justify-content: center; /* Establecer un ancho fijo para el formulario */
+    margin: 15px; /* Sin márgenes para un ajuste más limpio */
+    padding: 5px; /* Un poco de padding para los bordes del formulario */
+    border: 1px solid #ccc; /* Agregar un borde para un mejor aspecto */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+.login-form input {
+    margin: 5px 0; /* Margen vertical entre los inputs */
+    padding: 5px; /* Un poco de padding dentro de los inputs */
+    font-size: 20px; /* Tamaño de fuente más pequeño */
+    width: 50%; /* Ancho completo del formulario */
+    box-sizing: border-box; /* Asegura que el padding no aumente el ancho total */
+}
+
+.login-form button {
+    padding: 5px; /* Padding del botón */
+    font-size: 25px; /* Tamaño de fuente del botón */
+}
+
+.custom-delete-btn {
+    background-color: #ff4d4d; /* Cambia esto al color de fondo deseado */
+    color: white; /* Color del texto del botón */
+    border: none; /* Sin borde para un aspecto más limpio */
+    padding: 10px 20px; /* Espaciado interno */
+    border-radius: 5px; /* Bordes redondeados */
+    transition: background-color 0.3s; /* Transición suave para el cambio de color */
+}
+
+.custom-delete-btn:hover {
+    background-color: #ff1a1a; /* Cambia el color de fondo al pasar el mouse */
+}
+
+#formdelet{
+    background-color: rgba(229, 160, 70, 0.8);
+
+}

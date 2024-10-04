@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs');
 const exphbs = require('express-handlebars');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
@@ -8,12 +9,26 @@ const sharp = require('sharp');
 require('dotenv').config();
 const vision = require('@google-cloud/vision');
 const cors = require('cors');
+const session = require('express-session'); // Asegúrate de instalar express-session
+
+// Agregar este bloque de código aquí
+const credentialsPath = path.join(__dirname, '/google-credentials.json');
+const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
 
 const client = new vision.ImageAnnotatorClient({
-  keyFilename: path.join(__dirname, 'google-credentials.json') // Cargar el archivo de credenciales
+  credentials: credentials // Cargar las credenciales desde el archivo
 });
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // Agregar para manejar JSON
+
+// Configuración de la sesión
+app.use(session({
+  secret: 'your-secret-key', // Cambia esto por una clave secreta más segura
+  resave: false,
+  saveUninitialized: true,
+}));
 
 // Configuración de Cloudinary
 cloudinary.config({
@@ -94,14 +109,14 @@ app.get('/', async (req, res) => {
     const photoCount = photoCountResult.rows[0].count; // Obtener el número de fotos subidas
     console.log('Número de fotos subidas:', photoCount);
 
-    res.render('index', { photos, photoCount }); // Pasar las fotos y el contador a la plantilla
+    res.render('index', { photos, photoCount, user: req.session.user }); // Pasar las fotos, el contador y la sesión del usuario a la plantilla
   } catch (error) {
     console.error('Error loading photos:', error);
     res.status(500).send('Error loading photos');
   }
 });
 
-// Ruta de carga de fotos// Ruta de carga de fotos
+// Ruta de carga de fotos
 app.post('/upload', upload.array('photos', 10), async (req, res) => {
   const files = req.files;
 
@@ -123,11 +138,9 @@ app.post('/upload', upload.array('photos', 10), async (req, res) => {
 
         // Comprimir y subir la imagen si es segura
         const compressedBuffer = await sharp(file.buffer)
-  .resize({ width: 1200, height: 675, fit: 'contain' }) // Para 16:9
-  //.resize({ width: 1200, height: 900, fit: 'contain' }) // Para 4:3
-  .jpeg({ quality: 80 })
-  .toBuffer();
-
+          .resize({ width: 1200, height: 675, fit: 'contain' }) // Para 16:9
+          .jpeg({ quality: 80 })
+          .toBuffer();
 
         const uploadResult = await new Promise((resolve, reject) => {
           cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
@@ -142,8 +155,8 @@ app.post('/upload', upload.array('photos', 10), async (req, res) => {
         const query = 'INSERT INTO photos (url) VALUES ($1)';
         await pool.query(query, [uploadResult.url]);
       } catch (err) {
-        console.error(`Error processing file ${file.originalname}:`, err);
-        throw new Error(`Error processing file ${file.originalname}`);
+        console.error('Error processing file ${file.originalname}:, err');
+        throw new Error('Error processing file ${file.originalname}');
       }
     });
 
@@ -155,54 +168,109 @@ app.post('/upload', upload.array('photos', 10), async (req, res) => {
   }
 });
 
-// Ruta para eliminar una foto por ID// Ruta para eliminar una foto por ID
-app.post('/delete-photo/:id', async (req, res) => {
+// Ruta para cerrar sesión
+app.post('/logout', (req, res) => {
+  req.session.user = null; // Limpia la sesión del usuario
+  res.redirect('/'); // Redirige a la página principal
+});
+
+
+// Middleware para verificar si el usuario es administrador
+function isAdmin(req, res, next) {
+  if (!req.session.user) {
+    return res.status(403).send('You do not have permission to access this section..');
+  }
+  
+  if (req.session.user.username !== 'admin') { // Verificar que el nombre de usuario sea 'admin'
+    return res.status(403).send('You do not have permission to access this section.');
+  }
+  
+  next();
+}
+
+// Ruta para iniciar sesión
+app.post('/login', (req, res) => {
+  const { username, password } = req.body; // Asegúrate de tener un formulario que envíe estos datos
+
+  // Aquí debes verificar el nombre de usuario y la contraseña
+  if (username === 'admin' && password === 'tomas2411') { // Cambia esto a tu lógica de autenticación
+    req.session.user = { username }; // Guardar información del usuario en la sesión
+    return res.redirect('/'); // Redirigir a la página principal
+  }
+
+  res.status(401).json({ error: 'Unauthorized' });
+});
+
+// Ruta para eliminar una foto por ID
+app.post('/delete-photo/:id', isAdmin, async (req, res) => {
   const { id } = req.params; // Obtener el ID de la imagen a eliminar
   console.log('ID de la imagen a eliminar:', id); // Diagnóstico
 
+  // Verificar que el ID sea válido
+  if (!id || isNaN(id)) {
+    return res.status(400).json({ message: 'Invalid ID format' });
+  }
+
   try {
-      // Consulta para obtener la URL de la imagen que se va a eliminar
-      const result = await pool.query('SELECT url FROM photos WHERE id = $1', [id]);
-      console.log('Resultado de la consulta:', result); // Diagnóstico
+    // Consulta para obtener la URL de la imagen que se va a eliminar
+    const result = await pool.query('SELECT url FROM photos WHERE id = $1', [id]);
+    console.log('Resultado de la consulta:', result); // Diagnóstico
 
-      if (result.rowCount === 0) {
-          return res.status(404).json({ message: 'Image not found' });
-      }
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Image not found' });
+    }
 
-      const imageUrl = result.rows[0].url;
-      console.log('URL de la imagen a eliminar:', imageUrl); // Diagnóstico
+    const imageUrl = result.rows[0].url;
 
-      // Eliminar la imagen de Cloudinary
-      const publicId = imageUrl.split('/').pop().split('.')[0]; // Obtiene el ID público de la URL
-      try {
-          await cloudinary.uploader.destroy(publicId);
-          console.log('Imagen eliminada de Cloudinary');
-      } catch (cloudinaryError) {
-          console.error('Error al eliminar de Cloudinary:', cloudinaryError);
-          return res.status(500).json({ message: 'Error al eliminar la imagen de Cloudinary' });
-      }
+    // Eliminar la imagen de Cloudinary
+    const publicId = imageUrl.split('/').pop().split('.')[0]; // Obtener el ID público de Cloudinary
+    await cloudinary.uploader.destroy(publicId);
 
-      // Eliminar la entrada de la base de datos
-      await pool.query('DELETE FROM photos WHERE id = $1', [id]);
-      res.redirect('/'); // Redirigir a la galería después de eliminar
-  } catch (error) {
-      console.error('Error en la ruta de eliminación:', error);
-      res.status(500).json({ message: 'Internal Server Error' });
+    // Eliminar la imagen de la base de datos
+    await pool.query('DELETE FROM photos WHERE id = $1', [id]);
+    res.status(200).json({ message: 'Image deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting photo:', err);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
+// Ruta para eliminar una foto por ID
+app.delete('/delete-photo/:id', isAdmin, async (req, res) => {
+  const { id } = req.params; // Obtener el ID de la imagen a eliminar
+  console.log('ID de la imagen a eliminar:', id); // Diagnóstico
 
+  // Verificar que el ID sea válido
+  if (!id || isNaN(id)) {
+    return res.status(400).json({ message: 'Invalid ID format' });
+  }
 
+  try {
+    // Consulta para obtener la URL de la imagen que se va a eliminar
+    const result = await pool.query('SELECT url FROM photos WHERE id = $1', [id]);
+    console.log('Resultado de la consulta:', result); // Diagnóstico
 
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Image not found' });
+    }
 
-// Middleware para manejar errores
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Algo salió mal en el servidor!');
+    const imageUrl = result.rows[0].url;
+
+    // Eliminar la imagen de Cloudinary
+    const publicId = imageUrl.split('/').pop().split('.')[0]; // Obtener el ID público de Cloudinary
+    await cloudinary.uploader.destroy(publicId);
+
+    // Eliminar la imagen de la base de datos
+    await pool.query('DELETE FROM photos WHERE id = $1', [id]);
+    res.status(200).json({ message: 'Image deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting photo:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
-const publicId = imageUrl.split('/').pop().split('.')[0]; // Obtiene el ID público de la URL
+// Iniciar el servidor
 
-// init
-const PORT = process.env.PORT || 3001;
+// Iniciar el servidor
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server listening on port http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
